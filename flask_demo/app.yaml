@@ -1,0 +1,17 @@
+runtime: python38 # or another supported version
+
+instance_class: F1 # this is the cheapest option
+
+env_variables:
+  MYSQL_USER: root
+  MYSQL_PASSWORD: ah08EbAGxF04I503
+  MYSQL_DB: "SpotifyHelpr"
+  MYSQL_HOST: 35.232.56.109
+
+handlers:
+
+- url: /script
+  static_dir: static/script
+
+- url: /styles
+  static_dir: static/styles
