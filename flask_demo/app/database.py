@@ -1,5 +1,6 @@
 """Defines all the functions related to the database"""
 from app import db
+from sqlalchemy.sql import text
 
 def fetch_songs() -> dict:
     """Reads all tasks listed in the songs table
@@ -58,15 +59,62 @@ def fetch_songsFoundIn() -> dict:
     conn = db.connect()
     query_results = conn.execute("Select * from SongsFoundIn;").fetchall()
     conn.close()
-    playlist_list = []
+    songsFoundIn_list = []
     for result in query_results:
         item = {
             "songId": result[0],
             "playlistId": result[1]
         }
-        playlist_list.append(item)
+        songsFoundIn_list.append(item)
 
     return songsFoundIn_list
+
+
+def fetch_playlistsForUser(userId: int) -> dict:
+    """Reads all playlists for a specific user
+
+    Returns:
+        A list of dictionaries
+    """
+
+    conn = db.connect()
+    query_results = conn.execute(f"SELECT * FROM Playlists WHERE userId={userId};").fetchall()
+    conn.close()
+    results_list = []
+    for result in query_results:
+        item = {
+            "playlistId": result[0],
+            "playlistName": result[1],
+            "userId": result[2]
+        }
+        results_list.append(item)
+
+    return results_list
+
+
+def fetch_songsForPlaylist(playlistId: int) -> dict:
+    """Reads all songs for a specific playlist
+
+    Returns:
+        A list of dictionaries
+    """
+
+    conn = db.connect()
+    query_results = conn.execute(f"SELECT * FROM Songs WHERE songId IN (SELECT songId FROM SongsFoundIn WHERE playlistId = {playlistId})").fetchall()
+    conn.close()
+    results_list = []
+    for result in query_results:
+        item = {
+            "songId": result[0],
+            "name": result[1],
+            "artist": result[2],
+            "genre": result[3],
+            "url": result[4],
+            "likenessFactor": result[5]
+        }
+        results_list.append(item)
+
+    return results_list
 
 
 def update_task_entry(task_id: int, text: str) -> None:
@@ -103,7 +151,7 @@ def update_status_entry(task_id: int, text: str) -> None:
     conn.close()
 
 
-def insert_new_task(text: str) ->  int:
+def insert_new_task(text: str) -> int:
     """Insert new task to todo table.
 
     Args:
@@ -122,6 +170,50 @@ def insert_new_task(text: str) ->  int:
     conn.close()
 
     return task_id
+
+
+def insert_new_song(songId: str, playlistId: int) -> int:
+    """Insert new task to todo table.
+
+    Args:
+        text (str): Task description
+
+    Returns: The task ID for the inserted entry
+    """
+
+    conn = db.connect()
+    query = f'Insert into SongsFoundIn Values("{songId}", {playlistId})'
+    db.execute(text(query).execution_options(autocommit=True))
+    #db.session.commit()
+    #query_results = conn.execute("Select LAST_INSERT_ID();")
+    #query_results = [x for x in query_results]
+    #task_id = query_results[0][0]
+    conn.close()
+
+    return 65
+
+
+def delete_playlist(playlistId: int) -> int:
+    """Insert new task to todo table.
+
+    Args:
+        text (str): Task description
+
+    Returns: The task ID for the inserted entry
+    """
+
+    app.logger.debug(playlistId)
+
+    conn = db.connect()
+    query = f'DELETE from Playlists WHERE playlistId={playlistId}'
+    db.execute(text(query).execution_options(autocommit=True))
+    #db.session.commit()
+    #query_results = conn.execute("Select LAST_INSERT_ID();")
+    #query_results = [x for x in query_results]
+    #task_id = query_results[0][0]
+    conn.close()
+
+    return 65
 
 
 def remove_task_by_id(task_id: int) -> None:

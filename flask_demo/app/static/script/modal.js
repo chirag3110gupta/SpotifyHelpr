@@ -24,14 +24,19 @@ $(document).ready(function () {
 
 
     $('#submit-task').click(function () {
+        //const tID = $('#task-form-display').attr('taskID');
+        //const button = document.querySelector('[data-content="1"]');
         const tID = $('#task-form-display').attr('taskID');
         console.log($('#task-modal').find('.form-control').val())
+        console.log(tID)
         $.ajax({
             type: 'POST',
-            url: tID ? '/edit/' + tID : '/create',
+            //url: tID ? '/edit/' + tID : '/create',
+            url: '/create',
             contentType: 'application/json;charset=UTF-8',
             data: JSON.stringify({
-                'description': $('#task-modal').find('.form-control').val()
+                'songId': $('#task-modal').find('.form-control').val(),
+                'playlistId': tID
             }),
             success: function (res) {
                 console.log(res.response)
@@ -44,7 +49,9 @@ $(document).ready(function () {
     });
 
     $('.remove').click(function () {
+        console.log("here")
         const remove = $(this)
+        console.log(remove.data('source'))
         $.ajax({
             type: 'POST',
             url: '/delete/' + remove.data('source'),
@@ -61,7 +68,7 @@ $(document).ready(function () {
     $('.state').click(function () {
         const state = $(this)
         const tID = state.data('source')
-        const new_state
+        const new_state = ""
         if (state.text() === "In Progress") {
             new_state = "Complete"
         } else if (state.text() === "Complete") {

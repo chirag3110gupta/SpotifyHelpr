@@ -1,14 +1,23 @@
 """ Specifies routing for the application"""
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, Flask
 from app import app
 from app import database as db_helper
+
+import logging
+
+handler = logging.FileHandler("test.log")  # Create the file logger
+app.logger.addHandler(handler)             # Add it to the built-in logger
+app.logger.setLevel(logging.DEBUG)         # Set the log level to debug
+
+USR = 90
 
 @app.route("/delete/<int:task_id>", methods=['POST'])
 def delete(task_id):
     """ recieved post requests for entry delete """
 
     try:
-        db_helper.remove_task_by_id(task_id)
+        db_helper.delete_playlist(task_id)
+        console.log("removing", task_id)
         result = {'success': True, 'response': 'Removed task'}
     except:
         result = {'success': False, 'response': 'Something went wrong'}
@@ -21,6 +30,7 @@ def update(task_id):
     """ recieved post requests for entry updates """
 
     data = request.get_json()
+    app.logger.debug(data)
 
     try:
         if "status" in data:
@@ -41,7 +51,7 @@ def update(task_id):
 def create():
     """ recieves post requests to add new task """
     data = request.get_json()
-    db_helper.insert_new_task(data['description'])
+    app.logger.debug(db_helper.insert_new_song(data['songId'], data['playlistId']))
     result = {'success': True, 'response': 'Done'}
     return jsonify(result)
 
@@ -49,5 +59,11 @@ def create():
 @app.route("/")
 def homepage():
     """ returns rendered homepage """
-    items = db_helper.fetch_songs()
+    items = db_helper.fetch_playlistsForUser(USR)
+    for item in items:
+        songs = db_helper.fetch_songsForPlaylist(item["playlistId"])
+        #app.logger.debug(songs)
+        item["songs"] = songs
+
+    #app.logger.debug(items)
     return render_template("index.html", items=items)
