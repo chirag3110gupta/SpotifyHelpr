@@ -172,7 +172,7 @@ def insert_new_task(text: str) -> int:
     return task_id
 
 
-def insert_new_song(songId: str, playlistId: int) -> int:
+def insert_new_song(songId: str, playlistId: int) -> None:
     """Insert new task to todo table.
 
     Args:
@@ -184,36 +184,40 @@ def insert_new_song(songId: str, playlistId: int) -> int:
     conn = db.connect()
     query = f'Insert into SongsFoundIn Values("{songId}", {playlistId})'
     db.execute(text(query).execution_options(autocommit=True))
-    #db.session.commit()
     #query_results = conn.execute("Select LAST_INSERT_ID();")
     #query_results = [x for x in query_results]
     #task_id = query_results[0][0]
     conn.close()
 
-    return 65
 
-
-def delete_playlist(playlistId: int) -> int:
-    """Insert new task to todo table.
+def create_playlist(playlistName: str, userId: int) -> None:
+    """Insert new playlist to Playlists table.
 
     Args:
-        text (str): Task description
+        playlistName (str): new playlist name
 
-    Returns: The task ID for the inserted entry
+    Returns: The playlist ID for the inserted entry
     """
 
-    app.logger.debug(playlistId)
+    conn = db.connect()
+    query = f"INSERT INTO Playlists SELECT MAX(playlistId) + 1, '{playlistName}', {userId} FROM Playlists"
+    db.execute(text(query).execution_options(autocommit=True))
+    conn.close()
+
+
+def delete_playlist(playlistId: int) -> None:
+    """Delete playlist in Playlists table.
+
+    Args:
+        playlistId (int): playlistId to delete
+    """
+
+    print(playlistId)
 
     conn = db.connect()
     query = f'DELETE from Playlists WHERE playlistId={playlistId}'
     db.execute(text(query).execution_options(autocommit=True))
-    #db.session.commit()
-    #query_results = conn.execute("Select LAST_INSERT_ID();")
-    #query_results = [x for x in query_results]
-    #task_id = query_results[0][0]
     conn.close()
-
-    return 65
 
 
 def remove_task_by_id(task_id: int) -> None:

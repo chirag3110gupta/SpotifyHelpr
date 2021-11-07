@@ -6,12 +6,15 @@ $(document).ready(function () {
         const taskID = button.data('source') // Extract info from data-* attributes
         const content = button.data('content') // Extract info from data-* attributes
 
+        console.log("taskId", taskID)
+        console.log("taskId", taskID)
+
         const modal = $(this)
-        if (taskID === 'New Task') {
+        if (taskID === 'New Playlist') {
             modal.find('.modal-title').text(taskID)
             $('#task-form-display').removeAttr('taskID')
         } else {
-            modal.find('.modal-title').text('Edit Task ' + taskID)
+            modal.find('.modal-title').text('Edit Playlist ' + taskID)
             $('#task-form-display').attr('taskID', taskID)
         }
 
@@ -24,37 +27,55 @@ $(document).ready(function () {
 
 
     $('#submit-task').click(function () {
-        //const tID = $('#task-form-display').attr('taskID');
-        //const button = document.querySelector('[data-content="1"]');
         const tID = $('#task-form-display').attr('taskID');
-        console.log($('#task-modal').find('.form-control').val())
-        console.log(tID)
-        $.ajax({
-            type: 'POST',
-            //url: tID ? '/edit/' + tID : '/create',
-            url: '/create',
-            contentType: 'application/json;charset=UTF-8',
-            data: JSON.stringify({
-                'songId': $('#task-modal').find('.form-control').val(),
-                'playlistId': tID
-            }),
-            success: function (res) {
-                console.log(res.response)
-                location.reload();
-            },
-            error: function () {
-                console.log('Error');
-            }
-        });
+        if (tID) {
+          console.log("edit", tID)
+          $.ajax({
+              type: 'POST',
+              url: '/edit/' + tID,
+              contentType: 'application/json;charset=UTF-8',
+              data: JSON.stringify({
+                  'songId': $('#task-modal').find('.form-control').val(),
+                  'playlistId': tID
+              }),
+              success: function (res) {
+                  console.log(res.response)
+                  location.reload();
+              },
+              error: function () {
+                  console.log('Error');
+              }
+          });
+
+        } else {
+          console.log("create", tID)
+          $.ajax({
+              type: 'POST',
+              url: '/create',
+              contentType: 'application/json;charset=UTF-8',
+              data: JSON.stringify({
+                  'playlistName': $('#task-modal').find('.form-control').val(),
+              }),
+              success: function (res) {
+                  console.log(res.response)
+                  location.reload();
+              },
+              error: function () {
+                  console.log('Error');
+              }
+          });
+        }
     });
 
     $('.remove').click(function () {
-        console.log("here")
         const remove = $(this)
-        console.log(remove.data('source'))
         $.ajax({
             type: 'POST',
-            url: '/delete/' + remove.data('source'),
+            url: '/delete',
+            contentType: 'application/json;charset=UTF-8',
+            data: JSON.stringify({
+                'playlistId': remove.data('source')
+            }),
             success: function (res) {
                 console.log(res.response)
                 location.reload();

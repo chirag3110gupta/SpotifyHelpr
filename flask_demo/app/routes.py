@@ -11,13 +11,14 @@ app.logger.setLevel(logging.DEBUG)         # Set the log level to debug
 
 USR = 90
 
-@app.route("/delete/<int:task_id>", methods=['POST'])
-def delete(task_id):
+@app.route("/delete", methods=['POST'])
+def delete():
     """ recieved post requests for entry delete """
 
+    data = request.get_json()
+
     try:
-        db_helper.delete_playlist(task_id)
-        console.log("removing", task_id)
+        db_helper.delete_playlist(data["playlistId"])
         result = {'success': True, 'response': 'Removed task'}
     except:
         result = {'success': False, 'response': 'Something went wrong'}
@@ -30,7 +31,7 @@ def update(task_id):
     """ recieved post requests for entry updates """
 
     data = request.get_json()
-    app.logger.debug(data)
+    app.logger.debug("edit", data)
 
     try:
         if "status" in data:
@@ -47,23 +48,49 @@ def update(task_id):
     return jsonify(result)
 
 
+#@app.route("/create", methods=['POST'])
+#def create():
+#    """ recieves post requests to add new song """
+#
+#    data = request.get_json()
+#    app.logger.debug("create", data)
+#
+#    db_helper.insert_new_song(data['songId'], data['playlistId'])
+#    result = {'success': True, 'response': 'Done'}
+#    return jsonify(result)
+
+
 @app.route("/create", methods=['POST'])
 def create():
-    """ recieves post requests to add new task """
+    """ recieves post requests to create playlist """
+
     data = request.get_json()
-    app.logger.debug(db_helper.insert_new_song(data['songId'], data['playlistId']))
+    app.logger.debug("create", data)
+
+    db_helper.create_playlist(data["playlistName"], USR)
     result = {'success': True, 'response': 'Done'}
     return jsonify(result)
 
 
 @app.route("/")
 def homepage():
-    """ returns rendered homepage """
-    items = db_helper.fetch_playlistsForUser(USR)
-    for item in items:
-        songs = db_helper.fetch_songsForPlaylist(item["playlistId"])
-        #app.logger.debug(songs)
-        item["songs"] = songs
+  """ returns rendered homepage """
+  #items = db_helper.fetch_playlistsForUser(USR)
+  #for item in items:
+  #    songs = db_helper.fetch_songsForPlaylist(item["playlistId"])
+  #    item["songs"] = songs
 
-    #app.logger.debug(items)
-    return render_template("index.html", items=items)
+  #app.logger.debug(items[0])
+  #return render_template("index.html", items=items)
+  return render_template("home.html")
+
+@app.route("/playlists")
+def playlists():
+  """ returns playlist page """
+  items = db_helper.fetch_playlistsForUser(USR)
+  #for item in items:
+  #    songs = db_helper.fetch_songsForPlaylist(item["playlistId"])
+  #    item["songs"] = songs
+
+  app.logger.debug(items[0])
+  return render_template("playlist.html", items=items, usr=USR)
