@@ -13,84 +13,54 @@ USR = 90
 
 @app.route("/delete", methods=['POST'])
 def delete():
-    """ recieved post requests for entry delete """
+  """ recieved post requests for entry delete """
 
-    data = request.get_json()
+  data = request.get_json()
 
-    try:
-        db_helper.delete_playlist(data["playlistId"])
-        result = {'success': True, 'response': 'Removed task'}
-    except:
-        result = {'success': False, 'response': 'Something went wrong'}
+  try:
+    db_helper.delete_playlist(data["playlistId"])
+    result = {'success': True, 'response': 'Removed task'}
+  except:
+    result = {'success': False, 'response': 'Something went wrong'}
 
-    return jsonify(result)
-
-
-@app.route("/edit/<int:task_id>", methods=['POST'])
-def update(task_id):
-    """ recieved post requests for entry updates """
-
-    data = request.get_json()
-    app.logger.debug("edit", data)
-
-    try:
-        if "status" in data:
-            db_helper.update_status_entry(task_id, data["status"])
-            result = {'success': True, 'response': 'Status Updated'}
-        elif "description" in data:
-            db_helper.update_task_entry(task_id, data["description"])
-            result = {'success': True, 'response': 'Task Updated'}
-        else:
-            result = {'success': True, 'response': 'Nothing Updated'}
-    except:
-        result = {'success': False, 'response': 'Something went wrong'}
-
-    return jsonify(result)
+  return jsonify(result)
 
 
-#@app.route("/create", methods=['POST'])
-#def create():
-#    """ recieves post requests to add new song """
-#
-#    data = request.get_json()
-#    app.logger.debug("create", data)
-#
-#    db_helper.insert_new_song(data['songId'], data['playlistId'])
-#    result = {'success': True, 'response': 'Done'}
-#    return jsonify(result)
+@app.route("/edit", methods=['POST'])
+def update():
+  """ recieved post requests for entry updates """
+
+  data = request.get_json()
+  app.logger.debug("edit", data)
+
+  try:
+    db_helper.update_playlist(data["playlistId"], data["playlistName"])
+    result = {'success': True, 'response': 'Status Updated'}
+  except:
+    result = {'success': False, 'response': 'Something went wrong'}
+
+  return jsonify(result)
 
 
 @app.route("/create", methods=['POST'])
 def create():
-    """ recieves post requests to create playlist """
+  """ recieves post requests to create playlist """
 
-    data = request.get_json()
-    app.logger.debug("create", data)
+  data = request.get_json()
+  app.logger.debug("create", data)
 
-    db_helper.create_playlist(data["playlistName"], USR)
-    result = {'success': True, 'response': 'Done'}
-    return jsonify(result)
+  db_helper.create_playlist(data["playlistName"], USR)
+  result = {'success': True, 'response': 'Done'}
+  return jsonify(result)
 
 
 @app.route("/")
 def homepage():
   """ returns rendered homepage """
-  #items = db_helper.fetch_playlistsForUser(USR)
-  #for item in items:
-  #    songs = db_helper.fetch_songsForPlaylist(item["playlistId"])
-  #    item["songs"] = songs
-
-  #app.logger.debug(items[0])
-  #return render_template("index.html", items=items)
   return render_template("home.html")
 
 @app.route("/playlists")
 def playlists():
   """ returns playlist page """
   items = db_helper.fetch_playlistsForUser(USR)
-  #for item in items:
-  #    songs = db_helper.fetch_songsForPlaylist(item["playlistId"])
-  #    item["songs"] = songs
-
-  app.logger.debug(items[0])
   return render_template("playlist.html", items=items, usr=USR)

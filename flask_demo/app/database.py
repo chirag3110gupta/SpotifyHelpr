@@ -172,6 +172,14 @@ def insert_new_task(text: str) -> int:
     return task_id
 
 
+def remove_task_by_id(task_id: int) -> None:
+    """ remove entries based on task ID """
+    conn = db.connect()
+    query = 'Delete From tasks where id={};'.format(task_id)
+    conn.execute(query)
+    conn.close()
+
+
 def insert_new_song(songId: str, playlistId: int) -> None:
     """Insert new task to todo table.
 
@@ -212,17 +220,26 @@ def delete_playlist(playlistId: int) -> None:
         playlistId (int): playlistId to delete
     """
 
-    print(playlistId)
-
     conn = db.connect()
     query = f'DELETE from Playlists WHERE playlistId={playlistId}'
     db.execute(text(query).execution_options(autocommit=True))
     conn.close()
 
 
-def remove_task_by_id(task_id: int) -> None:
-    """ remove entries based on task ID """
+def update_playlist(playlistId: int, playlistName: str) -> None:
+    """Update playlist in Playlists table.
+
+    Args:
+        playlistId (int): playlistId to update
+        playlistName (str): playlistName to update
+    """
+
+    print("playlistId", playlistId)
+    print("playlistName", playlistName)
+
     conn = db.connect()
-    query = 'Delete From tasks where id={};'.format(task_id)
-    conn.execute(query)
+    query = f'UPDATE Playlists SET playlistName="{playlistName}" WHERE playlistId={playlistId}'
+    db.execute(text(query).execution_options(autocommit=True))
     conn.close()
+
+
