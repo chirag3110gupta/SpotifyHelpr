@@ -117,69 +117,6 @@ def fetch_songsForPlaylist(playlistId: int) -> dict:
     return results_list
 
 
-def update_task_entry(task_id: int, text: str) -> None:
-    """Updates task description based on given `task_id`
-
-    Args:
-        task_id (int): Targeted task_id
-        text (str): Updated description
-
-    Returns:
-        None
-    """
-
-    conn = db.connect()
-    query = 'Update tasks set task = "{}" where id = {};'.format(text, task_id)
-    conn.execute(query)
-    conn.close()
-
-
-def update_status_entry(task_id: int, text: str) -> None:
-    """Updates task status based on given `task_id`
-
-    Args:
-        task_id (int): Targeted task_id
-        text (str): Updated status
-
-    Returns:
-        None
-    """
-
-    conn = db.connect()
-    query = 'Update tasks set status = "{}" where id = {};'.format(text, task_id)
-    conn.execute(query)
-    conn.close()
-
-
-def insert_new_task(text: str) -> int:
-    """Insert new task to todo table.
-
-    Args:
-        text (str): Task description
-
-    Returns: The task ID for the inserted entry
-    """
-
-    conn = db.connect()
-    query = 'Insert Into tasks (task, status) VALUES ("{}", "{}");'.format(
-        text, "Todo")
-    conn.execute(query)
-    query_results = conn.execute("Select LAST_INSERT_ID();")
-    query_results = [x for x in query_results]
-    task_id = query_results[0][0]
-    conn.close()
-
-    return task_id
-
-
-def remove_task_by_id(task_id: int) -> None:
-    """ remove entries based on task ID """
-    conn = db.connect()
-    query = 'Delete From tasks where id={};'.format(task_id)
-    conn.execute(query)
-    conn.close()
-
-
 def insert_new_song(songId: str, playlistId: int) -> None:
     """Insert new task to todo table.
 
@@ -190,7 +127,7 @@ def insert_new_song(songId: str, playlistId: int) -> None:
     """
 
     conn = db.connect()
-    query = f'Insert into SongsFoundIn Values("{songId}", {playlistId})'
+    query = f"Insert into SongsFoundIn Values('{songId}', {playlistId})"
     db.execute(text(query).execution_options(autocommit=True))
     #query_results = conn.execute("Select LAST_INSERT_ID();")
     #query_results = [x for x in query_results]
@@ -221,7 +158,7 @@ def delete_playlist(playlistId: int) -> None:
     """
 
     conn = db.connect()
-    query = f'DELETE from Playlists WHERE playlistId={playlistId}'
+    query = f"DELETE from Playlists WHERE playlistId={playlistId}"
     db.execute(text(query).execution_options(autocommit=True))
     conn.close()
 
@@ -238,8 +175,34 @@ def update_playlist(playlistId: int, playlistName: str) -> None:
     print("playlistName", playlistName)
 
     conn = db.connect()
-    query = f'UPDATE Playlists SET playlistName="{playlistName}" WHERE playlistId={playlistId}'
+    query = f"UPDATE Playlists SET playlistName='{playlistName}' WHERE playlistId={playlistId}"
     db.execute(text(query).execution_options(autocommit=True))
     conn.close()
 
+
+def search_songs(search: str) -> dict:
+  """ Search songs in Songs table.
+
+  Args:
+    search (str): search query for name
+  """
+
+
+  conn = db.connect()
+  query = f"SELECT * FROM Songs WHERE name LIKE '{search}%' ORDER BY name"
+  query_results = conn.execute(text(query)).fetchall()
+  conn.close()
+  song_list = []
+  for result in query_results:
+      item = {
+          "songId": result[0],
+          "name": result[1],
+          "artist": result[2],
+          "genre": result[3],
+          "url": result[4],
+          "likenessFactor": result[5]
+      }
+      song_list.append(item)
+
+  return song_list
 
