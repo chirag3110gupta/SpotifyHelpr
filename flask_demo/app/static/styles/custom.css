@@ -63,3 +63,21 @@ hr {
 .update {
     width: 10%;
 }
+
+.playlist_content_container {
+    text-align: center;
+    padding: 100px;
+}
+
+.friends_table {
+    text-align: center;
+    margin: 20px;
+}
+
+.body {
+    width: 50%;
+}
+
+.mt-4 {
+    padding-left: 25px;
+}

@@ -67,6 +67,18 @@ def search():
   return jsonify(result)
 
 
+@app.route("/get_songs", methods=["POST"])
+def get_songs():
+  """ receives posts request to get songs from playlist """
+
+  data = request.get_json()
+
+  song_list = db_helper.get_songs_by_playlist(data["playlistId"])
+  result = {"success": True, "response": "Done", "song_list": song_list, "playlistName": data["playlistName"]}
+
+  return jsonify(result)
+
+
 @app.route("/playlists")
 def playlists():
   """ returns playlist page """
@@ -83,5 +95,6 @@ def songs():
 @app.route("/")
 def homepage():
   """ returns rendered homepage """
-  return render_template("home.html")
+  items = db_helper.get_friend_reviews(USR)
+  return render_template("home.html", items=items, usr=USR)
 

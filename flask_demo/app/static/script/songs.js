@@ -15,12 +15,10 @@ $(document).ready(function () {
         });
         data += "</ul>";
         $("#songlist").html(data);
-        //location.reload();
       },
       error: function () {
         console.log('Error');
       }
     });
-
   });
 });

@@ -21,6 +21,36 @@
       <a href="/">Home</a>
       <a href="/playlists">Playlists</a>
       <a href="/songs">Songs</a>
+      <p>Current User: {{ usr }}</p>
     </main>
+
+    <div>
+      <h4 class="mt-4">Recent Reviews from Friends</h4>
+
+      <table class="friends_table">
+        <thead>
+          <tr>
+            <th class="name">userName</th>
+            <th class="num">songName</th>
+            <th class="num">artist</th>
+            <th class="body">body</th>
+            <th class="update">rating</th>
+          </tr>
+        </thead>
+
+        <tbody>
+        {% for item in items %}
+          <tr>
+            <td>{{item.userName}}</td>
+            <td>{{item.name}}</td>
+            <td>{{item.artist}}</td>
+            <td>{{item.body}}</td>
+            <td>{{item.rating}}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
   </body>
 </html>

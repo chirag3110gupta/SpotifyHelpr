@@ -206,3 +206,48 @@ def search_songs(search: str) -> dict:
 
   return song_list
 
+def get_songs_by_playlist(playlistId: int) -> dict:
+  """ Get songs by playlistId
+
+  Args:
+    playlistId (int): id for songs to get
+  """
+
+  conn = db.connect()
+  query = f"SELECT name, artist, r.avg_rating FROM Songs NATURAL JOIN (SELECT songId FROM SongsFoundIn WHERE playlistId = {playlistId}) s LEFT JOIN (SELECT songId, avg(rating) AS avg_rating FROM Reviews GROUP BY songId) r ON Songs.songId = r.songId;"
+  query_results = conn.execute(text(query)).fetchall()
+  conn.close()
+  song_list = []
+  for result in query_results:
+      item = {
+          "name": result[0],
+          "artist": result[1],
+          "avg_rating": result[2]
+      }
+      song_list.append(item)
+
+  return song_list
+
+def get_friend_reviews(userId: int) -> dict:
+  """ Get reviews by userId of friends
+
+  Args:
+    userId (int): id for reviews to get of friends
+  """
+
+  conn = db.connect()
+  query = f"SELECT Users.userName, sub.name, sub.artist, sub.body, sub.rating FROM (SELECT Reviews.userId, Songs.name, Songs.artist, Reviews.body, Reviews.rating FROM Songs NATURAL JOIN Reviews) sub JOIN Users ON Users.userId = sub.UserId WHERE sub.userId IN (SELECT friendId FROM Friends WHERE userId = {userId}) UNION SELECT Users.userName, sub.name, sub.artist, sub.body, sub.rating FROM (SELECT Reviews.userId, Songs.name, Songs.artist, Reviews.body, Reviews.rating FROM Songs NATURAL JOIN Reviews) sub JOIN Users ON Users.userId = sub.UserId WHERE sub.userId IN (SELECT userId FROM Friends WHERE friendId = {userId});"
+  query_results = conn.execute(text(query)).fetchall()
+  conn.close()
+  song_list = []
+  for result in query_results:
+      item = {
+          "userName": result[0],
+          "name": result[1],
+          "artist": result[2],
+          "body": result[3],
+          "rating": result[4]
+      }
+      song_list.append(item)
+
+  return song_list

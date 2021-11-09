@@ -67,7 +67,7 @@
 
       <tbody>
       {% for item in items %}
-        <tr>
+        <tr id={{item.playlistId}}>
           <td>{{item.playlistName}}</td>
           <td>tbd</td>
 
@@ -81,6 +81,11 @@
       </tbody>
     </table>
     </div>
+
+    <div class="playlist_content_container">
+      <p id="playlist_content"></p>
+    </div>
+
   </body>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
