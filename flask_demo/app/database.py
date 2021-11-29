@@ -79,15 +79,19 @@ def fetch_playlistsForUser(userId: int) -> dict:
 
     conn = db.connect()
     query_results = conn.execute(f"SELECT * FROM Playlists WHERE userId={userId};").fetchall()
-    conn.close()
     results_list = []
+
     for result in query_results:
+        song_count = conn.execute(f"SELECT COUNT(songId) FROM SongsFoundIn WHERE playlistId={result[0]}").fetchall()
         item = {
             "playlistId": result[0],
             "playlistName": result[1],
-            "userId": result[2]
+            "userId": result[2],
+            "songCount": song_count
         }
         results_list.append(item)
+
+    conn.close()
 
     return results_list
 
