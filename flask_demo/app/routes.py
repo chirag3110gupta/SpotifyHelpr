@@ -95,6 +95,7 @@ def songs():
 @app.route("/")
 def homepage():
   """ returns rendered homepage """
-  items = db_helper.get_friend_reviews(USR)
-  return render_template("home.html", items=items, usr=USR)
+  friend_reviews_data = db_helper.get_friend_reviews(USR)
+  playlist_data = db_helper.fetch_playlistsForUser(USR)
+  return render_template("home.html", friend_reviews_data=friend_reviews_data, playlist_data=playlist_data, usr=USR)
 
