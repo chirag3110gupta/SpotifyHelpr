@@ -79,17 +79,17 @@ def get_songs():
   return jsonify(result)
 
 
-@app.route("/playlists")
-def playlists():
-  """ returns playlist page """
-  items = db_helper.fetch_playlistsForUser(USR)
-  return render_template("playlist.html", items=items, usr=USR)
-
-
-@app.route("/songs")
-def songs():
-  """ returns songs page """
-  return render_template("song.html")
+#@app.route("/playlists")
+#def playlists():
+#  """ returns playlist page """
+#  items = db_helper.fetch_playlistsForUser(USR)
+#  return render_template("playlist.html", items=items, usr=USR)
+#
+#
+#@app.route("/songs")
+#def songs():
+#  """ returns songs page """
+#  return render_template("song.html")
 
 
 @app.route("/")
