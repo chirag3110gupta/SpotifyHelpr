@@ -106,12 +106,11 @@ def homepage():
 @app.route("/login", methods=["POST", "GET"])
 def login():
   """ returns rendered login page """
-  if(request.method == "POST"):
+  if(request.method == "POST" and request.form.get("userId") != ""):
     session["userId"] = request.form.get("userId")
     return redirect("/home")
 
-  else:
-    return render_template("login.html")
+  return render_template("login.html")
 
 @app.route("/logout")
 def logout():

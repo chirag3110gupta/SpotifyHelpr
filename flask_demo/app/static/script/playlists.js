@@ -103,6 +103,7 @@ $(document).ready(function () {
           data += "<li>" + value.name + " - " + value.artist + " - " + avg_rating + "</li>";
         });
         data += "</ul>";
+        data += "<p><input type='text' name='userId' placeholder='songId' /></p><p><input type='submit' value='Add' class='btn btn-outline-info btn-sm' id='submit' /></p>";
         $("#playlist_content").html(data);
       },
       error: function () {
