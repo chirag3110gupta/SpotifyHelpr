@@ -1,15 +1,15 @@
 """ Specifies routing for the application"""
-from flask import render_template, request, jsonify, Flask
+from flask import render_template, request, redirect, jsonify, session, Flask
 from app import app
 from app import database as db_helper
 
 import logging
 
+app.secret_key = "secret"
+
 handler = logging.FileHandler("test.log")  # Create the file logger
 app.logger.addHandler(handler)             # Add it to the built-in logger
 app.logger.setLevel(logging.DEBUG)         # Set the log level to debug
-
-USR = 90
 
 @app.route("/delete", methods=["POST"])
 def delete():
@@ -92,10 +92,37 @@ def get_songs():
 #  return render_template("song.html")
 
 
-@app.route("/")
+@app.route("/home")
 def homepage():
   """ returns rendered homepage """
-  friend_reviews_data = db_helper.get_friend_reviews(USR)
-  playlist_data = db_helper.fetch_playlistsForUser(USR)
-  return render_template("home.html", friend_reviews_data=friend_reviews_data, playlist_data=playlist_data, usr=USR)
+  if("userId" in session):
+    friend_reviews_data = db_helper.get_friend_reviews(session["userId"])
+    playlist_data = db_helper.fetch_playlistsForUser(session["userId"])
+    return render_template("home.html", friend_reviews_data=friend_reviews_data, playlist_data=playlist_data, usr=session["userId"])
 
+  else:
+    return redirect("/login")
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+  """ returns rendered login page """
+  if(request.method == "POST"):
+    session["userId"] = request.form.get("userId")
+    return redirect("/home")
+
+  else:
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+  """ redirects user to login page """
+  session.pop("userId")
+  return redirect("/login")
+
+@app.route("/")
+def default():
+  if("userId" in session and session["userId"] != -1):
+    return redirect("/home")
+
+  else:
+    return redirect("/login")

@@ -27,7 +27,6 @@ $(document).ready(function () {
   $("#submit-task").click(function () {
     const tID = $("#task-form-display").attr("taskID");
     if (tID) {
-      console.log("edit", tID)
       $.ajax({
         type: "POST",
         url: "/edit",
@@ -46,7 +45,6 @@ $(document).ready(function () {
       });
 
     } else {
-      console.log("create", tID)
       $.ajax({
         type: "POST",
         url: "/create",
@@ -85,7 +83,6 @@ $(document).ready(function () {
   });
 
   $(document).delegate("tr", "click", function(e) {
-    console.log($(this).children('td:first').text())
     $.ajax({
       type: "POST",
       url: "/get_songs",

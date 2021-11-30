@@ -3,11 +3,11 @@ $(document).ready(function () {
     if ($("#searchbox").val() !== "") {
       $("#songlist").empty();
       $.ajax({
-        type: 'POST',
-        url: '/search',
-        contentType: 'application/json;charset=UTF-8',
+        type: "POST",
+        url: "/search",
+        contentType: "application/json;charset=UTF-8",
         data: JSON.stringify({
-          'text': $("#searchbox").val()
+          "text": $("#searchbox").val()
         }),
         success: function (res) {
           var data = "<ul>";
@@ -18,7 +18,7 @@ $(document).ready(function () {
           $("#songlist").html(data);
         },
         error: function () {
-          console.log('Error');
+          console.log("Error");
         }
       });
     }
