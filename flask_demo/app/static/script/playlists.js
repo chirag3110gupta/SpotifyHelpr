@@ -1,7 +1,7 @@
-$(document).ready(function () {
+$(document).ready(function() {
   // example: https://getbootstrap.com/docs/4.2/components/modal/
   // show modal
-  $("#task-modal").on("show.bs.modal", function (event) {
+  $("#task-modal").on("show.bs.modal", function(event) {
     const button = $(event.relatedTarget) // Button that triggered the modal
     const taskID = button.data("source") // Extract info from data-* attributes
     const content = button.data("content") // Extract info from data-* attributes
@@ -24,7 +24,7 @@ $(document).ready(function () {
     }
   })
 
-  $("#submit-task").click(function () {
+  $("#submit-task").click(function() {
     const tID = $("#task-form-display").attr("taskID");
     if (tID) {
       $.ajax({
@@ -35,11 +35,11 @@ $(document).ready(function () {
           "playlistId": tID,
           "playlistName": $("#task-modal").find(".form-control").val(),
         }),
-        success: function (res) {
+        success: function(res) {
           console.log(res.response)
           location.reload();
         },
-        error: function () {
+        error: function() {
           console.log("Error");
         }
       });
@@ -52,18 +52,18 @@ $(document).ready(function () {
         data: JSON.stringify({
           "playlistName": $("#task-modal").find(".form-control").val(),
         }),
-        success: function (res) {
+        success: function(res) {
           console.log(res.response)
           location.reload();
         },
-        error: function () {
+        error: function() {
           console.log("Error");
         }
       });
     }
   });
 
-  $(".remove").click(function () {
+  $(".remove").click(function() {
     const remove = $(this)
     $.ajax({
       type: "POST",
@@ -72,17 +72,20 @@ $(document).ready(function () {
       data: JSON.stringify({
         "playlistId": remove.data("source")
       }),
-      success: function (res) {
+      success: function(res) {
         console.log(res.response)
         location.reload();
       },
-      error: function () {
+      error: function() {
         console.log("Error");
       }
     });
   });
 
+  var currentPlaylistId = 0;
+
   $(document).delegate("tr", "click", function(e) {
+    currentPlaylistId = $(this).attr("id");
     $.ajax({
       type: "POST",
       url: "/get_songs",
@@ -91,8 +94,7 @@ $(document).ready(function () {
         "playlistId": $(this).attr("id"),
         "playlistName": $(this).children('td:first').text()
       }),
-      success: function (res) {
-        console.log(res)
+      success: function(res) {
         var data = "<h4>" + res.playlistName + "</h4><ul>";
         $.each(res.song_list, function(i, value) {
           var avg_rating = value.avg_rating;
@@ -103,12 +105,38 @@ $(document).ready(function () {
           data += "<li>" + value.name + " - " + value.artist + " - " + avg_rating + "</li>";
         });
         data += "</ul>";
-        data += "<p><input type='text' name='userId' placeholder='songId' /></p><p><input type='submit' value='Add' class='btn btn-outline-info btn-sm' id='submit' /></p>";
+        data += "<p><input type='text' placeholder='songId' id='songId' /></p><p><input type='submit' value='Add' class='btn btn-outline-info btn-sm' id='songIdSubmit' /></p>";
         $("#playlist_content").html(data);
       },
-      error: function () {
+      error: function() {
         console.log("Error");
       }
     });
   });
+
+  $(document).on("click", "#songIdSubmit", function() {
+    $.ajax({
+      type: "POST",
+      url: "/add_song",
+      contentType: "application/json;charset=UTF-8",
+      data: JSON.stringify({
+        "playlistId": currentPlaylistId,
+        "songId": $("#songId").val()
+      }),
+      success: function(res) {
+        if(res.success) {
+          alert("Added Song to PlaylistId " + res.data.playlistId);
+          location.reload();
+
+        } else {
+          alert("SongId does not exist");
+        }
+      },
+      error: function() {
+        console.log("Error");
+      }
+    });
+  });
+
+
 });

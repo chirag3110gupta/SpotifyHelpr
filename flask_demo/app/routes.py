@@ -31,7 +31,6 @@ def update():
   """ received post requests for entry updates """
 
   data = request.get_json()
-  app.logger.debug("edit", data)
 
   try:
     db_helper.update_playlist(data["playlistId"], data["playlistName"])
@@ -47,7 +46,6 @@ def create():
   """ receives post requests to create playlist """
 
   data = request.get_json()
-  app.logger.debug("create", data)
 
   db_helper.create_playlist(data["playlistName"], USR)
   result = {"success": True, "response": "Done"}
@@ -59,7 +57,6 @@ def search():
   """ receives posts request to search songs """
 
   data = request.get_json()
-  app.logger.debug("search", data)
 
   song_list = db_helper.search_songs(data["text"])
   result = {"success": True, "response": "Done", "song_list": song_list}
@@ -69,7 +66,7 @@ def search():
 
 @app.route("/get_songs", methods=["POST"])
 def get_songs():
-  """ receives posts request to get songs from playlist """
+  """ receives post requests to get songs from playlist """
 
   data = request.get_json()
 
@@ -78,18 +75,20 @@ def get_songs():
 
   return jsonify(result)
 
+@app.route("/add_song", methods=["POST"])
+def add_song():
+  """ receives post requests to add songs to playlist """
 
-#@app.route("/playlists")
-#def playlists():
-#  """ returns playlist page """
-#  items = db_helper.fetch_playlistsForUser(USR)
-#  return render_template("playlist.html", items=items, usr=USR)
-#
-#
-#@app.route("/songs")
-#def songs():
-#  """ returns songs page """
-#  return render_template("song.html")
+  data = request.get_json()
+  if(db_helper.song_exists(data["songId"])):
+    db_helper.add_song_to_playlist(data["playlistId"], data["songId"])
+
+    result = {"success": True, "response": "Done", "data": data}
+    return jsonify(result)
+
+  result = {"success": False, "response": "Done", "data": data}
+  return jsonify(result)
+
 
 
 @app.route("/home")

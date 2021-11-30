@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).ready(function() {
   $("#searchbox").on("input", function(e) {
     if ($("#searchbox").val() !== "") {
       $("#songlist").empty();
@@ -9,7 +9,7 @@ $(document).ready(function () {
         data: JSON.stringify({
           "text": $("#searchbox").val()
         }),
-        success: function (res) {
+        success: function(res) {
           var data = "<ul>";
           $.each(res.song_list, function(i, value) {
             data += "<li>" + value.name + " - " + value.artist + "</li>";
@@ -17,7 +17,7 @@ $(document).ready(function () {
           data += "</ul>";
           $("#songlist").html(data);
         },
-        error: function () {
+        error: function() {
           console.log("Error");
         }
       });
