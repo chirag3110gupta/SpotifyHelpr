@@ -10,7 +10,7 @@ def fetch_songs() -> dict:
   """
 
   conn = db.connect()
-  query_results = conn.execute("Select * from Songs;").fetchall()
+  query_results = conn.execute("SELECT * from Songs;").fetchall()
   conn.close()
   song_list = []
   for result in query_results:
@@ -35,7 +35,7 @@ def fetch_playlists() -> dict:
   """
 
   conn = db.connect()
-  query_results = conn.execute("Select * from Playlists;").fetchall()
+  query_results = conn.execute("SELECT * from Playlists;").fetchall()
   conn.close()
   playlist_list = []
   for result in query_results:
@@ -57,7 +57,7 @@ def fetch_songsFoundIn() -> dict:
   """
 
   conn = db.connect()
-  query_results = conn.execute("Select * from SongsFoundIn;").fetchall()
+  query_results = conn.execute("SELECT * from SongsFoundIn;").fetchall()
   conn.close()
   songsFoundIn_list = []
   for result in query_results:
@@ -121,48 +121,48 @@ def fetch_songsForPlaylist(playlistId: int) -> dict:
   return results_list
 
 def create_playlist(playlistName: str, userId: int) -> None:
-    """Insert new playlist to Playlists table.
+  """Insert new playlist to Playlists table.
 
-    Args:
-        playlistName (str): new playlist name
+  Args:
+      playlistName (str): new playlist name
 
-    Returns: The playlist ID for the inserted entry
-    """
+  Returns: The playlist ID for the inserted entry
+  """
 
-    conn = db.connect()
-    query = f"INSERT INTO Playlists SELECT MAX(playlistId) + 1, '{playlistName}', {userId} FROM Playlists"
-    db.execute(text(query).execution_options(autocommit=True))
-    conn.close()
+  conn = db.connect()
+  query = f"INSERT INTO Playlists SELECT MAX(playlistId) + 1, '{playlistName}', {userId} FROM Playlists"
+  db.execute(text(query).execution_options(autocommit=True))
+  conn.close()
 
 
 def delete_playlist(playlistId: int) -> None:
-    """Delete playlist in Playlists table.
+  """Delete playlist in Playlists table.
 
-    Args:
-        playlistId (int): playlistId to delete
-    """
+  Args:
+      playlistId (int): playlistId to delete
+  """
 
-    conn = db.connect()
-    query = f"DELETE from Playlists WHERE playlistId={playlistId}"
-    db.execute(text(query).execution_options(autocommit=True))
-    conn.close()
+  conn = db.connect()
+  query = f"DELETE from Playlists WHERE playlistId={playlistId}"
+  db.execute(text(query).execution_options(autocommit=True))
+  conn.close()
 
 
 def update_playlist(playlistId: int, playlistName: str) -> None:
-    """Update playlist in Playlists table.
+  """Update playlist in Playlists table.
 
-    Args:
-        playlistId (int): playlistId to update
-        playlistName (str): playlistName to update
-    """
+  Args:
+      playlistId (int): playlistId to update
+      playlistName (str): playlistName to update
+  """
 
-    print("playlistId", playlistId)
-    print("playlistName", playlistName)
+  print("playlistId", playlistId)
+  print("playlistName", playlistName)
 
-    conn = db.connect()
-    query = f"UPDATE Playlists SET playlistName='{playlistName}' WHERE playlistId={playlistId}"
-    db.execute(text(query).execution_options(autocommit=True))
-    conn.close()
+  conn = db.connect()
+  query = f"UPDATE Playlists SET playlistName='{playlistName}' WHERE playlistId={playlistId}"
+  db.execute(text(query).execution_options(autocommit=True))
+  conn.close()
 
 
 def search_songs(search: str) -> dict:
@@ -179,15 +179,15 @@ def search_songs(search: str) -> dict:
   conn.close()
   song_list = []
   for result in query_results:
-      item = {
-          "songId": result[0],
-          "name": result[1],
-          "artist": result[2],
-          "genre": result[3],
-          "url": result[4],
-          "likenessFactor": result[5]
-      }
-      song_list.append(item)
+    item = {
+      "songId": result[0],
+      "name": result[1],
+      "artist": result[2],
+      "genre": result[3],
+      "url": result[4],
+      "likenessFactor": result[5]
+    }
+    song_list.append(item)
 
   return song_list
 
@@ -204,12 +204,12 @@ def get_songs_by_playlist(playlistId: int) -> dict:
   conn.close()
   song_list = []
   for result in query_results:
-      item = {
-          "name": result[0],
-          "artist": result[1],
-          "avg_rating": result[2]
-      }
-      song_list.append(item)
+    item = {
+      "name": result[0],
+      "artist": result[1],
+      "avg_rating": result[2]
+    }
+    song_list.append(item)
 
   return song_list
 
@@ -226,14 +226,14 @@ def get_friend_reviews(userId: int) -> dict:
   conn.close()
   song_list = []
   for result in query_results:
-      item = {
-          "userName": result[0],
-          "name": result[1],
-          "artist": result[2],
-          "body": result[3],
-          "rating": result[4]
-      }
-      song_list.append(item)
+    item = {
+      "userName": result[0],
+      "name": result[1],
+      "artist": result[2],
+      "body": result[3],
+      "rating": result[4]
+    }
+    song_list.append(item)
 
   return song_list
 
@@ -251,3 +251,35 @@ def add_song_to_playlist(playlistId: int, songId: str) -> None:
   db.execute(text(query).execution_options(autocommit=True))
   conn.close()
 
+def get_friends(userId: int) -> dict:
+  conn = db.connect()
+  query_results = conn.execute(f"SELECT friendId FROM Friends WHERE userId={userId};").fetchall()
+  conn.close()
+  friends_list = []
+  for result in query_results:
+    item = {
+      "friendId": result[0]
+    }
+    friends_list.append(item)
+
+  return friends_list
+
+def user_exists(userId: int) -> bool:
+  conn = db.connect()
+  query = f"SELECT * FROM Users WHERE userId='{userId}';"
+  query_results = conn.execute(text(query)).fetchall()
+  conn.close()
+
+  return len(query_results) != 0
+
+def delete_friend(userId: int, friendId: int) -> None:
+  conn = db.connect()
+  query = f"DELETE from Friends WHERE userId={userId} AND friendId={friendId}"
+  db.execute(text(query).execution_options(autocommit=True))
+  conn.close()
+
+def create_friend(userId: int, friendId: int) -> None:
+  conn = db.connect()
+  query = f"INSERT INTO Friends Values({friendId}, {userId}, 0.0)"
+  db.execute(text(query).execution_options(autocommit=True))
+  conn.close()

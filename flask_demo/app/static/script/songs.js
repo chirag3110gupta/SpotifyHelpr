@@ -12,7 +12,7 @@ $(document).ready(function() {
         success: function(res) {
           var data = "<ul>";
           $.each(res.song_list, function(i, value) {
-            data += "<li>" + value.name + " - " + value.artist + "</li>";
+            data += "<li>" + value.name + " - " + value.artist + " - (" + value.songId + ")</li>";
           });
           data += "</ul>";
           $("#songlist").html(data);

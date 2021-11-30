@@ -29,7 +29,7 @@ $(document).ready(function() {
     if (tID) {
       $.ajax({
         type: "POST",
-        url: "/edit",
+        url: "/edit_playlist",
         contentType: "application/json;charset=UTF-8",
         data: JSON.stringify({
           "playlistId": tID,
@@ -47,7 +47,7 @@ $(document).ready(function() {
     } else {
       $.ajax({
         type: "POST",
-        url: "/create",
+        url: "/create_playlist",
         contentType: "application/json;charset=UTF-8",
         data: JSON.stringify({
           "playlistName": $("#task-modal").find(".form-control").val(),
@@ -67,7 +67,7 @@ $(document).ready(function() {
     const remove = $(this)
     $.ajax({
       type: "POST",
-      url: "/delete",
+      url: "/delete_playlist",
       contentType: "application/json;charset=UTF-8",
       data: JSON.stringify({
         "playlistId": remove.data("source")
@@ -137,6 +137,4 @@ $(document).ready(function() {
       }
     });
   });
-
-
 });
