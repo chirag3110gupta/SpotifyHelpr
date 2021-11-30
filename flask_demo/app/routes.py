@@ -11,8 +11,8 @@ handler = logging.FileHandler("test.log")  # Create the file logger
 app.logger.addHandler(handler)             # Add it to the built-in logger
 app.logger.setLevel(logging.DEBUG)         # Set the log level to debug
 
-@app.route("/delete", methods=["POST"])
-def delete():
+@app.route("/delete_playlist", methods=["POST"])
+def delete_playlist():
   """ received post requests for entry delete """
 
   data = request.get_json()
@@ -26,8 +26,8 @@ def delete():
   return jsonify(result)
 
 
-@app.route("/edit", methods=["POST"])
-def update():
+@app.route("/update_playlist", methods=["POST"])
+def update_playlist():
   """ received post requests for entry updates """
 
   data = request.get_json()
@@ -41,14 +41,46 @@ def update():
   return jsonify(result)
 
 
-@app.route("/create", methods=["POST"])
-def create():
+@app.route("/create_playlist", methods=["POST"])
+def create_playlist():
   """ receives post requests to create playlist """
 
   data = request.get_json()
 
-  db_helper.create_playlist(data["playlistName"], USR)
+  db_helper.create_playlist(data["playlistName"], session["userId"])
   result = {"success": True, "response": "Done"}
+  return jsonify(result)
+
+
+@app.route("/delete_friend", methods=["POST"])
+def delete_friend():
+  """ received post requests for entry delete """
+
+  data = request.get_json()
+
+  try:
+    db_helper.delete_friend(session["userId"], data["friendId"])
+    result = {"success": True, "response": "Removed task"}
+  except:
+    result = {"success": False, "response": "Something went wrong"}
+
+  return jsonify(result)
+
+
+@app.route("/create_friend", methods=["POST"])
+def create_friend():
+  """ receives post requests to create playlist """
+
+  data = request.get_json()
+
+  if(db_helper.user_exists(data["friendId"]) and data["friendId"].isnumeric()):
+    print("user exist")
+    db_helper.create_friend(session["userId"], data["friendId"])
+
+    result = {"success": True, "response": "Done", "data": data}
+    return jsonify(result)
+
+  result = {"success": False, "response": "Done", "data": data}
   return jsonify(result)
 
 
@@ -89,7 +121,11 @@ def add_song():
   result = {"success": False, "response": "Done", "data": data}
   return jsonify(result)
 
-
+@app.route("/friends")
+def friends():
+  """ returns friends page """
+  friends_list_data = db_helper.get_friends(session["userId"])
+  return render_template("friends.html", friends_list_data=friends_list_data, user=session["userId"])
 
 @app.route("/home")
 def homepage():
