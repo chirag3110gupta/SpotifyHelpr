@@ -105,7 +105,7 @@ def create_review():
 
   data = request.get_json()
 
-  if(is_float(data["rating"])):
+  if(is_float(data["rating"]) and db_helper.song_exists(data["songId"])):
     print("creating review")
     db_helper.create_review(data["rating"], data["body"], data["songId"], session["userId"])
 
