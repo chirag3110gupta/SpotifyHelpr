@@ -1,0 +1,30 @@
+CREATE PROCEDURE get_Averages()
+	BEGIN
+		DECLARE done int default 0;
+		DECLARE currUser INT;
+		DECLARE usercur CURSOR FOR SELECT DISTINCT userId FROM Users;
+		DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+		DROP TABLE IF EXISTS avgValsByUser;
+
+		CREATE TABLE avgValsByUser (
+			userId INT,
+			acousticness REAL,
+			danceability REAL,
+			energy REAL,
+			instrumentalness REAL,
+			liveness REAL,
+			speechiness REAL
+		);
+
+		OPEN usercur;
+		REPEAT
+			FETCH usercur INTO currUser;
+			INSERT INTO avgValsByUser
+			(SELECT userId, AVG(acousticness), AVG(danceability), AVG(energy), AVG(instrumentalness), AVG(liveness), AVG(speechiness) FROM (SELECT * FROM (SELECT * FROM (SELECT * FROM Users JOIN Playlists ON Users.userId = Playlists.userId WHERE Users.userId = currUser) temp JOIN SongsFoundIn ON temp.playlistId = SongsFoundIn.playlistId) temp2 JOIN Songs ON temp2.songId = Songs.songId)
+			GROUP BY userId;
+		UNTIL done
+		END REPEAT;
+
+		close deptcur;
+	END //
