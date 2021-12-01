@@ -173,3 +173,7 @@ cython_debug/
 !.vscode/*.code-snippets
 
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,visualstudiocode
+flask_demo/app/__pycache__/__init__.cpython-39.pyc
+.gitignore
+flask_demo/app/__pycache__/routes.cpython-39.pyc
+JavaScript Testing/CREATE PROCEDURE
