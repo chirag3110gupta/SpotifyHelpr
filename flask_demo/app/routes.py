@@ -74,8 +74,7 @@ def create_friend():
   data = request.get_json()
 
   if(db_helper.user_exists(data["friendId"]) and data["friendId"].isnumeric()):
-    print("user exist")
-    db_helper.create_friend(session["userId"], data["friendId"])
+    db_helper.create_friend(data["friendId"], session["userId"])
 
     result = {"success": True, "response": "Done", "data": data}
     return jsonify(result)
@@ -155,11 +154,23 @@ def add_song():
   return jsonify(result)
 
 
+@app.route("/get_averages", methods=["POST"])
+def get_averages():
+
+  data = request.get_json()
+  user_averages_data = db_helper.get_averages_for_user(session["userId"])
+  friends_averages_data = db_helper.get_averages_for_user(data["friendId"])
+
+  result = {"success": True, "response": "Done", "user_data": user_averages_data, "friends_data": friends_averages_data}
+  return jsonify(result)
+
+
 @app.route("/friends")
 def friends():
   """ returns friends page """
   friends_list_data = db_helper.get_friends(session["userId"])
-  return render_template("friends.html", friends_list_data=friends_list_data, user=session["userId"])
+  averages_list_data = db_helper.get_averages_for_user(session["userId"])
+  return render_template("friends.html", friends_list_data=friends_list_data, averages_list_data=averages_list_data, user=session["userId"])
 
 
 @app.route("/reviews")
@@ -175,6 +186,7 @@ def homepage():
   if("userId" in session):
     friend_reviews_data = db_helper.get_friend_reviews(session["userId"])
     playlist_data = db_helper.fetch_playlistsForUser(session["userId"])
+
     return render_template("home.html", friend_reviews_data=friend_reviews_data, playlist_data=playlist_data, user=session["userId"])
 
   else:

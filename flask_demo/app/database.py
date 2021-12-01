@@ -311,3 +311,24 @@ def create_review(rating: float, body: str, songId: str, userId: int) -> None:
   query = f"INSERT INTO Reviews SELECT MAX(reviewId) + 1, {rating}, '{body}', '{songId}', {userId} FROM Reviews"
   db.execute(text(query).execution_options(autocommit=True))
   conn.close()
+
+def get_averages_for_user(userId: int) -> dict:
+  conn = db.connect()
+  query = f"CALL get_Averages;"
+  db.execute(text(query).execution_options(autocommit=True))
+  query_results = conn.execute(f"SELECT * FROM avgValsByUser WHERE userId={userId};").fetchall()
+  conn.close()
+  averages_list = []
+  for result in query_results:
+    item = {
+      "userId": result[0],
+      "acousticness": result[1],
+      "danceability": result[2],
+      "energy": result[3],
+      "instrumentalness": result[4],
+      "liveness": result[5],
+      "speechiness": result[6]
+    }
+    averages_list.append(item)
+
+  return averages_list
