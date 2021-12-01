@@ -12,7 +12,7 @@ $(document).ready(function() {
           $("#songlist").empty();
           var data = "<ul>";
           $.each(res.song_list, function(i, value) {
-            data += "<li>" + value.name + " - " + value.artist + " - (" + value.songId + ")</li>";
+            data += "<li>" + value.name + " - " + value.artist + " - (" + value.songId + ") - <a target='_blank' href=https://" + value.url + ">" + value.url + "</a></li>";
           });
           data += "</ul>";
           $("#songlist").html(data);
@@ -34,7 +34,6 @@ $(document).ready(function() {
           "songId": $("#rec_searchbox").val()
         }),
         success: function(res) {
-          console.log("HERE", res);
           $("#song_rec_list").empty();
           var data = "<ul>";
           $.each(res.song_list, function(i, value) {
