@@ -41,7 +41,7 @@ def fetch_playlists() -> dict:
   for result in query_results:
     item = {
       "playlistId": result[0],
-      "playlistNamename": result[1],
+      "playlistName": result[1],
       "userId": result[2]
     }
     playlist_list.append(item)
@@ -278,8 +278,36 @@ def delete_friend(userId: int, friendId: int) -> None:
   db.execute(text(query).execution_options(autocommit=True))
   conn.close()
 
-def create_friend(userId: int, friendId: int) -> None:
+def create_friend(friendId: int, userId: int) -> None:
   conn = db.connect()
   query = f"INSERT INTO Friends Values({friendId}, {userId}, 0.0)"
+  db.execute(text(query).execution_options(autocommit=True))
+  conn.close()
+
+def get_reviews(userId: int) -> dict:
+  conn = db.connect()
+  query_results = conn.execute(f"SELECT * FROM Reviews WHERE userId={userId};").fetchall()
+  conn.close()
+  reviews_list = []
+  for result in query_results:
+    item = {
+      "reviewId": result[0],
+      "rating": result[1],
+      "body": result[2],
+      "songId": result[3]
+    }
+    reviews_list.append(item)
+
+  return reviews_list
+
+def delete_review(reviewId: int) -> None:
+  conn = db.connect()
+  query = f"DELETE from Reviews WHERE reviewId={reviewId}"
+  db.execute(text(query).execution_options(autocommit=True))
+  conn.close()
+
+def create_review(rating: float, body: str, songId: str, userId: int) -> None:
+  conn = db.connect()
+  query = f"INSERT INTO Reviews SELECT MAX(reviewId) + 1, {rating}, '{body}', '{songId}', {userId} FROM Reviews"
   db.execute(text(query).execution_options(autocommit=True))
   conn.close()
