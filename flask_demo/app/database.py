@@ -332,3 +332,18 @@ def get_averages_for_user(userId: int) -> dict:
     averages_list.append(item)
 
   return averages_list
+
+def get_likeness_songs(songId: str) -> dict:
+  conn = db.connect()
+  query_results = conn.execute(f"SELECT songId, name, artist FROM Songs WHERE likenessFactor = (SELECT likenessFactor FROM Songs WHERE songId ='{songId}') ORDER BY RAND() LIMIT 15;").fetchall()
+  conn.close()
+  song_list = []
+  for result in query_results:
+    item = {
+      "songId": result[0],
+      "name": result[1],
+      "artist": result[2]
+    }
+    song_list.append(item)
+
+  return song_list

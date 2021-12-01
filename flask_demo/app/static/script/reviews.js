@@ -12,7 +12,7 @@ $(document).ready(function() {
       $("#task-form-display").removeAttr("taskID")
 
     } else {
-      modal.find(".modal-title").text("Edit Playlist " + taskID)
+      modal.find(".modal-title").text("Edit Review " + taskID)
       $("#task-form-display").attr("taskID", taskID)
     }
 

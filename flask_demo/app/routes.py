@@ -26,8 +26,8 @@ def delete_playlist():
   return jsonify(result)
 
 
-@app.route("/update_playlist", methods=["POST"])
-def update_playlist():
+@app.route("/edit_playlist", methods=["POST"])
+def edit_playlist():
   """ received post requests for entry updates """
 
   data = request.get_json()
@@ -98,6 +98,21 @@ def delete_review():
   return jsonify(result)
 
 
+@app.route("/edit_review", methods=["POST"])
+def edit_review():
+  """ received post requests for entry updates """
+
+  data = request.get_json()
+
+  try:
+    db_helper.update_review(data["reviewId"], data["body"])
+    result = {"success": True, "response": "Status Updated"}
+  except:
+    result = {"success": False, "response": "Something went wrong"}
+
+  return jsonify(result)
+
+
 @app.route("/create_review", methods=["POST"])
 def create_review():
   """ receives post requests to create review """
@@ -156,12 +171,27 @@ def add_song():
 
 @app.route("/get_averages", methods=["POST"])
 def get_averages():
+  """ receives friendId to get average values for """
 
   data = request.get_json()
   user_averages_data = db_helper.get_averages_for_user(session["userId"])
   friends_averages_data = db_helper.get_averages_for_user(data["friendId"])
 
   result = {"success": True, "response": "Done", "user_data": user_averages_data, "friends_data": friends_averages_data}
+  return jsonify(result)
+
+
+@app.route("/get_song_recs", methods=["POST"])
+def get_song_recs():
+
+  data = request.get_json()
+  if(db_helper.song_exists(data["songId"])):
+    song_list = db_helper.get_likeness_songs(data["songId"])
+
+    result = {"success": True, "response": "Done", "song_list": song_list}
+    return jsonify(result)
+
+  result = {"success": False, "response": "Done", "data": data}
   return jsonify(result)
 
 
