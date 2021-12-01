@@ -66,33 +66,76 @@ $(document).ready(function() {
     });
   });
 
-  //$(document).delegate("tr", "click", function(e) {
-  //  currentPlaylistId = $(this).attr("id");
-  //  $.ajax({
-  //    type: "POST",
-  //    url: "/get_songs",
-  //    contentType: "application/json;charset=UTF-8",
-  //    data: JSON.stringify({
-  //      "playlistId": $(this).attr("id"),
-  //      "playlistName": $(this).children('td:first').text()
-  //    }),
-  //    success: function(res) {
-  //      var data = "<h4>" + res.playlistName + "</h4><ul>";
-  //      $.each(res.song_list, function(i, value) {
-  //        var avg_rating = value.avg_rating;
-  //        if (avg_rating == null) {
-  //          avg_rating = 0;
-  //        }
+  $(document).delegate("tr", "click", function(e) {
+    $.ajax({
+      type: "POST",
+      url: "/get_averages",
+      contentType: "application/json;charset=UTF-8",
+      data: JSON.stringify({
+        "friendId": $(this).attr("id")
+      }),
+      success: function(res) {
 
-  //        data += "<li>" + value.name + " - " + value.artist + " - " + avg_rating + "</li>";
-  //      });
-  //      data += "</ul>";
-  //      data += "<p><input type='text' placeholder='songId' id='songId' /></p><p><input type='submit' value='Add' class='btn btn-outline-info btn-sm' id='songIdSubmit' /></p>";
-  //      $("#playlist_content").html(data);
-  //    },
-  //    error: function() {
-  //      console.log("Error");
-  //    }
-  //  });
-  //});
+        console.log(res);
+
+        if(res.user_data.length > 0 && res.friends_data.length > 0) {
+          $("#myChart").remove();
+          $("div.chart_container").append("<canvas id='myChart' height='600' width='600'></canvas>");
+          let myChart = document.getElementById("myChart").getContext('2d');
+          let radarChart = new Chart(myChart, {
+            type: "radar",
+            data: {
+              labels: ["acousticness", "danceability", "energy", "instrumentalness", "liveness", "speechiness"],
+              datasets: [{
+                label: "User",
+                data: [
+                  res.user_data[0].acousticness,
+                  res.user_data[0].danceability,
+                  res.user_data[0].energy,
+                  res.user_data[0].instrumentalness,
+                  res.user_data[0].liveness,
+                  res.user_data[0].speechiness
+                ],
+                backgroundColor: [
+                    "rgba(255, 0, 0, 0.2)"
+                ],
+                borderColor: [
+                    "rgba(255, 0, 0, .4)"
+                ]
+              }, {
+                label:"Friend",
+                data: [
+                  res.friends_data[0].acousticness,
+                  res.friends_data[0].danceability,
+                  res.friends_data[0].energy,
+                  res.friends_data[0].instrumentalness,
+                  res.friends_data[0].liveness,
+                  res.friends_data[0].speechiness
+                ],
+                backgroundColor:[
+                    "rgba(0, 0, 255, 0.2)"
+                ],
+                borderColor: [
+                    "rgba(0, 0, 255, .4)"
+                ]
+              }]
+            },
+            options: {
+              responsive: false,
+              elements: {
+                line: {
+                  borderWidth: 3
+                }
+              }
+            }
+          })
+        } else {
+          alert("user or friend has no songs added");
+        }
+      },
+      error: function() {
+        console.log("Error");
+      }
+    });
+  });
 });
