@@ -19,7 +19,7 @@ def delete_playlist():
 
   try:
     db_helper.delete_playlist(data["playlistId"])
-    result = {"success": True, "response": "Removed task"}
+    result = {"success": True, "response": "Removed"}
   except:
     result = {"success": False, "response": "Something went wrong"}
 
@@ -60,7 +60,7 @@ def delete_friend():
 
   try:
     db_helper.delete_friend(session["userId"], data["friendId"])
-    result = {"success": True, "response": "Removed task"}
+    result = {"success": True, "response": "Removed"}
   except:
     result = {"success": False, "response": "Something went wrong"}
 
@@ -69,13 +69,45 @@ def delete_friend():
 
 @app.route("/create_friend", methods=["POST"])
 def create_friend():
-  """ receives post requests to create playlist """
+  """ receives post requests to create friend """
 
   data = request.get_json()
 
   if(db_helper.user_exists(data["friendId"]) and data["friendId"].isnumeric()):
     print("user exist")
     db_helper.create_friend(session["userId"], data["friendId"])
+
+    result = {"success": True, "response": "Done", "data": data}
+    return jsonify(result)
+
+  result = {"success": False, "response": "Done", "data": data}
+  return jsonify(result)
+
+
+@app.route("/delete_review", methods=["POST"])
+def delete_review():
+  """ received post requests for entry delete """
+
+  data = request.get_json()
+
+  try:
+    db_helper.delete_review(data["reviewId"])
+    result = {"success": True, "response": "Removed"}
+  except:
+    result = {"success": False, "response": "Something went wrong"}
+
+  return jsonify(result)
+
+
+@app.route("/create_review", methods=["POST"])
+def create_review():
+  """ receives post requests to create review """
+
+  data = request.get_json()
+
+  if(is_float(data["rating"])):
+    print("creating review")
+    db_helper.create_review(data["rating"], data["body"], data["songId"], session["userId"])
 
     result = {"success": True, "response": "Done", "data": data}
     return jsonify(result)
@@ -107,6 +139,7 @@ def get_songs():
 
   return jsonify(result)
 
+
 @app.route("/add_song", methods=["POST"])
 def add_song():
   """ receives post requests to add songs to playlist """
@@ -121,11 +154,20 @@ def add_song():
   result = {"success": False, "response": "Done", "data": data}
   return jsonify(result)
 
+
 @app.route("/friends")
 def friends():
   """ returns friends page """
   friends_list_data = db_helper.get_friends(session["userId"])
   return render_template("friends.html", friends_list_data=friends_list_data, user=session["userId"])
+
+
+@app.route("/reviews")
+def reviews():
+  """ returns reviews page """
+  reviews_list_data = db_helper.get_reviews(session["userId"])
+  return render_template("reviews.html", reviews_list_data=reviews_list_data, user=session["userId"])
+
 
 @app.route("/home")
 def homepage():
@@ -133,10 +175,11 @@ def homepage():
   if("userId" in session):
     friend_reviews_data = db_helper.get_friend_reviews(session["userId"])
     playlist_data = db_helper.fetch_playlistsForUser(session["userId"])
-    return render_template("home.html", friend_reviews_data=friend_reviews_data, playlist_data=playlist_data, usr=session["userId"])
+    return render_template("home.html", friend_reviews_data=friend_reviews_data, playlist_data=playlist_data, user=session["userId"])
 
   else:
     return redirect("/login")
+
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -147,11 +190,13 @@ def login():
 
   return render_template("login.html")
 
+
 @app.route("/logout")
 def logout():
   """ redirects user to login page """
   session.pop("userId")
   return redirect("/login")
+
 
 @app.route("/")
 def default():
@@ -160,3 +205,11 @@ def default():
 
   else:
     return redirect("/login")
+
+
+def is_float(element) -> bool:
+    try:
+        float(element)
+        return True
+    except ValueError:
+        return False
